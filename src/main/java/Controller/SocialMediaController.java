@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import Service.SocialMediaService;
 import Model.Account;
-
+import Model.Message;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 
@@ -32,7 +32,8 @@ public class SocialMediaController {
     public Javalin startAPI() {
         Javalin app = Javalin.create();
         app.post("/register", this::createAccountHandler);
-
+        app.post("/login", this::loginHandler);
+        app.post("/messages", this::createMessageHandler);
         return app;
     }
 
@@ -52,5 +53,28 @@ public class SocialMediaController {
         }
     }
 
+    private void loginHandler(Context ctx) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        Account account = mapper.readValue(ctx.body(), Account.class );
+        Account loggedIn = socialMediaService.login(account);
+        if(loggedIn==null){
+            ctx.status(401);
+        }else{
+            ctx.json(mapper.writeValueAsString(loggedIn));
+            ctx.status(200);
+        }
+    }
+
+    private void createMessageHandler(Context ctx) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        Message message = mapper.readValue(ctx.body(), Message.class );
+        Message createdMessage = socialMediaService.createMessage(message);
+        if(createdMessage==null){
+            ctx.status(400);
+        }else{
+            ctx.json(mapper.writeValueAsString(createdMessage));
+            ctx.status(200);
+        }
+    }
 
 }
