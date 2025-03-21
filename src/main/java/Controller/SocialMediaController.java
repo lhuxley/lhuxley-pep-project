@@ -8,6 +8,8 @@ import Model.Account;
 import Model.Message;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
+import java.util.List;
+import java.util.ArrayList;
 
 
 
@@ -34,6 +36,7 @@ public class SocialMediaController {
         app.post("/register", this::createAccountHandler);
         app.post("/login", this::loginHandler);
         app.post("/messages", this::createMessageHandler);
+        app.get("/messages", this::retrieveAllMessagesHandler);
         return app;
     }
 
@@ -77,4 +80,9 @@ public class SocialMediaController {
         }
     }
 
+    private void retrieveAllMessagesHandler(Context ctx) throws JsonProcessingException {
+        List<Message> messages = socialMediaService.retrieveAllMessages();
+        ctx.json(messages); 
+        ctx.status(200);
+    }
 }

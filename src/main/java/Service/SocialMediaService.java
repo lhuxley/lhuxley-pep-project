@@ -3,6 +3,8 @@ package Service;
 import DAO.SocialMediaDAO;
 import Model.Account;
 import Model.Message;
+import java.util.List;
+
 
 public class SocialMediaService {
     SocialMediaDAO socialMediaDAO;
@@ -22,5 +24,9 @@ public class SocialMediaService {
     public Message createMessage(Message message) {
         return socialMediaDAO.createMessage(message);
     }
+
+    public List<Message> retrieveAllMessages() {
+        return socialMediaDAO.retrieveAllMessages();
+    }  
 
 }
