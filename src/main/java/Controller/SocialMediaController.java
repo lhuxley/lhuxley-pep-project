@@ -37,8 +37,9 @@ public class SocialMediaController {
         app.post("/login", this::loginHandler);
         app.post("/messages", this::createMessageHandler);
         app.get("/messages", this::retrieveAllMessagesHandler);
-        app.get("/messages/{message_id}", this::retrieveMessageById);
-        app.delete("messages/{message_id}", this::deleteMessageById);
+        app.get("/messages/{message_id}", this::retrieveMessageByIdHandler);
+        app.delete("messages/{message_id}", this::deleteMessageByIdHandler);
+        app.patch("messages/{message_id}", this::updateMessageHandler);
         return app;
     }
 
@@ -88,7 +89,7 @@ public class SocialMediaController {
         ctx.status(200);
     }
 
-    private void retrieveMessageById(Context ctx) throws JsonProcessingException {
+    private void retrieveMessageByIdHandler(Context ctx) throws JsonProcessingException {
         
         int message_id = Integer.parseInt(ctx.pathParam("message_id"));
         Message message = socialMediaService.retrieveMessageById(message_id);
@@ -101,7 +102,7 @@ public class SocialMediaController {
         
     }
 
-    private void deleteMessageById(Context ctx) throws JsonProcessingException {
+    private void deleteMessageByIdHandler(Context ctx) throws JsonProcessingException {
         
         int message_id = Integer.parseInt(ctx.pathParam("message_id"));
         Message message = socialMediaService.deleteMessageById(message_id);
@@ -112,6 +113,22 @@ public class SocialMediaController {
         }
         
         ctx.json(message); 
+        
+    }
+
+    private void updateMessageHandler(Context ctx) throws JsonProcessingException {
+        
+        ObjectMapper mapper = new ObjectMapper();
+        int messageId = Integer.parseInt(ctx.pathParam("message_id"));
+        Message message = mapper.readValue(ctx.body(), Message.class );
+        message.setMessage_id(messageId);
+        Message returnedMessage = socialMediaService.updateMessage(message);
+        
+        if (returnedMessage == null){
+            ctx.status(400);
+            return;
+        }
+        ctx.status(200).json(returnedMessage);
         
     }
 }

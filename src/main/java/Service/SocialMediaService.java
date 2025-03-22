@@ -37,5 +37,7 @@ public class SocialMediaService {
         return socialMediaDAO.deleteMessageById(message_id);
     }
 
-
+    public Message updateMessage(Message message) {
+        return socialMediaDAO.updateMessage(message);
+    }
 }

@@ -199,7 +199,30 @@ public class SocialMediaDAO {
 
     }
 
+    public Message updateMessage(Message message) {
+        Connection connection = ConnectionUtil.getConnection();
+        
+        try {
+            Message oldmessage = retrieveMessageById(message.getMessage_id());
+            if (message.getMessage_text().length() > 0 && message.getMessage_text().length() < 256 && oldmessage != null) {
+                String sql = "UPDATE message SET message_text = ? WHERE message_id = ?;";
 
+                PreparedStatement preparedStatement = connection.prepareStatement(sql);
+                preparedStatement.setString(1, message.getMessage_text());
+                preparedStatement.setInt(2, message.getMessage_id());
+                preparedStatement.executeUpdate();
+                oldmessage.setMessage_text(message.message_text);
+                return oldmessage;
+            } else
+                return null;
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return null;
+
+    }
     
 
 }
