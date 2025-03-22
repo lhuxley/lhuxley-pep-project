@@ -9,7 +9,7 @@ import Model.Message;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import java.util.List;
-import java.util.ArrayList;
+
 
 
 
@@ -37,6 +37,8 @@ public class SocialMediaController {
         app.post("/login", this::loginHandler);
         app.post("/messages", this::createMessageHandler);
         app.get("/messages", this::retrieveAllMessagesHandler);
+        app.get("/messages/{message_id}", this::retrieveMessageById);
+        app.delete("messages/{message_id}", this::deleteMessageById);
         return app;
     }
 
@@ -84,5 +86,32 @@ public class SocialMediaController {
         List<Message> messages = socialMediaService.retrieveAllMessages();
         ctx.json(messages); 
         ctx.status(200);
+    }
+
+    private void retrieveMessageById(Context ctx) throws JsonProcessingException {
+        
+        int message_id = Integer.parseInt(ctx.pathParam("message_id"));
+        Message message = socialMediaService.retrieveMessageById(message_id);
+        if (message == null){
+            ctx.status(200);
+            return;
+        }
+        
+        ctx.json(message); 
+        
+    }
+
+    private void deleteMessageById(Context ctx) throws JsonProcessingException {
+        
+        int message_id = Integer.parseInt(ctx.pathParam("message_id"));
+        Message message = socialMediaService.deleteMessageById(message_id);
+        
+        if (message == null){
+            ctx.status(200);
+            return;
+        }
+        
+        ctx.json(message); 
+        
     }
 }

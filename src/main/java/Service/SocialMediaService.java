@@ -29,4 +29,13 @@ public class SocialMediaService {
         return socialMediaDAO.retrieveAllMessages();
     }  
 
+    public Message retrieveMessageById(Integer message_id) {
+        return socialMediaDAO.retrieveMessageById(message_id);
+    }
+
+    public Message deleteMessageById(Integer message_id) {
+        return socialMediaDAO.deleteMessageById(message_id);
+    }
+
+
 }

@@ -71,7 +71,7 @@ public class SocialMediaDAO {
             PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setString(1, account.getUsername());
             preparedStatement.setString(2, account.getPassword());
-            
+
             ResultSet rs = preparedStatement.executeQuery();
 
             if (rs.next()) {
@@ -94,7 +94,7 @@ public class SocialMediaDAO {
         Connection connection = ConnectionUtil.getConnection();
 
         try {
-            if (message.getMessage_text().length() != 0 && message.getMessage_text().length()<256){
+            if (message.getMessage_text().length() != 0 && message.getMessage_text().length() < 256) {
                 String sql = "insert into message (posted_by, message_text, time_posted_epoch) values (?,?,?);";
 
                 PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
@@ -109,10 +109,8 @@ public class SocialMediaDAO {
                     message.setMessage_id(messageId);
                 }
                 return message;
-            } 
-            else
+            } else
                 return null;
-            
 
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -133,12 +131,11 @@ public class SocialMediaDAO {
             ResultSet rs = preparedStatement.executeQuery();
 
             while (rs.next()) {
-                Message message = new Message(rs.getInt("message_id"), rs.getInt("posted_by"), rs.getString("message_text"), rs.getLong("time_posted_epoch"));
+                Message message = new Message(rs.getInt("message_id"), rs.getInt("posted_by"),
+                        rs.getString("message_text"), rs.getLong("time_posted_epoch"));
                 messages.add(message);
             }
             return messages;
-
-            
 
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -147,4 +144,62 @@ public class SocialMediaDAO {
         return null;
 
     }
+
+    public Message retrieveMessageById(Integer message_id) {
+        Connection connection = ConnectionUtil.getConnection();
+
+        Message message = new Message();
+
+        try {
+
+            String sql = "select * from message where message_id = ?;";
+
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, message_id);
+            ResultSet rs = preparedStatement.executeQuery();
+
+            if (rs.next()) {
+                message = new Message(rs.getInt("message_id"), rs.getInt("posted_by"), rs.getString("message_text"),
+                        rs.getLong("time_posted_epoch"));
+                return message;
+            } else {
+                return null;
+            }
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return null;
+
+    }
+
+    public Message deleteMessageById(Integer message_id) {
+        Connection connection = ConnectionUtil.getConnection();
+
+        try {
+
+            Message message = retrieveMessageById(message_id);
+            if (message == null) {
+                return null;
+            } else {
+                String sql = "delete from message where message_id = ?;";
+
+                PreparedStatement preparedStatement = connection.prepareStatement(sql);
+                preparedStatement.setInt(1, message_id);
+                preparedStatement.executeUpdate();
+
+                return message;
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return null;
+
+    }
+
+
+    
+
 }
