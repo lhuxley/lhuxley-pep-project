@@ -201,10 +201,11 @@ public class SocialMediaDAO {
 
     public Message updateMessage(Message message) {
         Connection connection = ConnectionUtil.getConnection();
-        
+
         try {
             Message oldmessage = retrieveMessageById(message.getMessage_id());
-            if (message.getMessage_text().length() > 0 && message.getMessage_text().length() < 256 && oldmessage != null) {
+            if (message.getMessage_text().length() > 0 && message.getMessage_text().length() < 256
+                    && oldmessage != null) {
                 String sql = "UPDATE message SET message_text = ? WHERE message_id = ?;";
 
                 PreparedStatement preparedStatement = connection.prepareStatement(sql);
@@ -223,6 +224,33 @@ public class SocialMediaDAO {
         return null;
 
     }
-    
+
+    public List<Message> retrieveMessagesByAccount(Integer account_id) {
+        Connection connection = ConnectionUtil.getConnection();
+        List<Message> messages = new ArrayList<>();
+
+        try {
+
+            String sql = "select * from message m left join account a on a.account_id = m.posted_by WHERE m.posted_by = ?";
+
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, account_id);
+            ResultSet rs = preparedStatement.executeQuery();
+
+            while (rs.next()) {
+                Message message = new Message(rs.getInt("message_id"), rs.getInt("posted_by"),
+                        rs.getString("message_text"), rs.getLong("time_posted_epoch"));
+                messages.add(message);
+            }
+
+            return messages;
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return null;
+
+    }
 
 }
