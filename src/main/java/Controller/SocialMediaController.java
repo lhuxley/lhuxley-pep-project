@@ -3,12 +3,15 @@ package Controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import Service.SocialMediaService;
+
 import Model.Account;
 import Model.Message;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import java.util.List;
+
+import Service.AccountService;
+import Service.MessageService;
 
 /**
  * TODO: You will need to write your own endpoints and handlers for your
@@ -27,11 +30,14 @@ public class SocialMediaController {
      *         controller.
      */
 
-    SocialMediaService socialMediaService;
+
+
+    AccountService accountService;
+    MessageService messageService;
 
     public SocialMediaController() {
-        socialMediaService = new SocialMediaService();
-
+        accountService = new AccountService();
+        messageService = new MessageService();
     }
 
     public Javalin startAPI() {
@@ -50,7 +56,7 @@ public class SocialMediaController {
     private void createAccountHandler(Context ctx) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         Account account = mapper.readValue(ctx.body(), Account.class);
-        Account createdAccount = socialMediaService.createAccount(account);
+        Account createdAccount = accountService.createAccount(account);
         if (createdAccount == null) {
             ctx.status(400);
         } else {
@@ -62,7 +68,7 @@ public class SocialMediaController {
     private void loginHandler(Context ctx) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         Account account = mapper.readValue(ctx.body(), Account.class);
-        Account loggedIn = socialMediaService.login(account);
+        Account loggedIn = accountService.login(account);
         if (loggedIn == null) {
             ctx.status(401);
         } else {
@@ -74,7 +80,7 @@ public class SocialMediaController {
     private void createMessageHandler(Context ctx) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         Message message = mapper.readValue(ctx.body(), Message.class);
-        Message createdMessage = socialMediaService.createMessage(message);
+        Message createdMessage = messageService.createMessage(message);
         if (createdMessage == null) {
             ctx.status(400);
         } else {
@@ -84,7 +90,7 @@ public class SocialMediaController {
     }
 
     private void retrieveAllMessagesHandler(Context ctx) throws JsonProcessingException {
-        List<Message> messages = socialMediaService.retrieveAllMessages();
+        List<Message> messages = messageService.retrieveAllMessages();
         ctx.json(messages);
         ctx.status(200);
     }
@@ -92,7 +98,7 @@ public class SocialMediaController {
     private void retrieveMessageByIdHandler(Context ctx) throws JsonProcessingException {
 
         int message_id = Integer.parseInt(ctx.pathParam("message_id"));
-        Message message = socialMediaService.retrieveMessageById(message_id);
+        Message message = messageService.retrieveMessageById(message_id);
         if (message == null) {
             ctx.status(200);
             return;
@@ -105,7 +111,7 @@ public class SocialMediaController {
     private void deleteMessageByIdHandler(Context ctx) throws JsonProcessingException {
 
         int message_id = Integer.parseInt(ctx.pathParam("message_id"));
-        Message message = socialMediaService.deleteMessageById(message_id);
+        Message message = messageService.deleteMessageById(message_id);
 
         if (message == null) {
             ctx.status(200);
@@ -122,7 +128,7 @@ public class SocialMediaController {
         int messageId = Integer.parseInt(ctx.pathParam("message_id"));
         Message message = mapper.readValue(ctx.body(), Message.class);
         message.setMessage_id(messageId);
-        Message returnedMessage = socialMediaService.updateMessage(message);
+        Message returnedMessage = messageService.updateMessage(message);
 
         if (returnedMessage == null) {
             ctx.status(400);
@@ -135,7 +141,7 @@ public class SocialMediaController {
     private void retrieveMessagesByAccountHandler(Context ctx) throws JsonProcessingException {
 
         int account_id = Integer.parseInt(ctx.pathParam("account_id"));
-        List<Message> messages = socialMediaService.retrieveMessagesByAccount(account_id);
+        List<Message> messages = messageService.retrieveMessagesByAccount(account_id);
 
         ctx.status(200).json(messages);
 
